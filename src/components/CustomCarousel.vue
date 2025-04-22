@@ -126,8 +126,8 @@ const numScroll = props.numScroll ?? 1;
 const circular = props.circular ?? false;
 const defaultSubtitle = props.subtitle ?? "This component is just for demo";
 
-const sideArrowBgColor = props.sideArrowBgColor || "bg-orange-500";
-const sideArrowTextColor = props.sideArrowTextColor || "text-white";
+const sideArrowBgColor = props.sideArrowBgColor || "";
+const sideArrowTextColor = props.sideArrowTextColor || "text-orange-500";
 const customClass = computed(() => props.customClass || "cursor-pointer");
 const showSideNavigation = props.showSideNavigation ?? true;
 const showBottomNavigation = props.showBottomNavigation ?? false;
