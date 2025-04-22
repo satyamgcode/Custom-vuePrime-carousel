@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-[#E5F6F3] min-h-screen rounded-3xl relative">
+  <div class="p-6 bg-[#E5F6F3] min-h-screen relative">
     <h2 class="text-xl font-semibold mb-6 text-center">{{ title }}</h2>
 
     <div class="relative max-w-[80vw] mx-auto">
@@ -7,8 +7,8 @@
       <p
         v-if="showSideNavigation"
         @click="prev"
-        :class="[
-          'absolute top-[45%] left-[-1.5rem] -translate-y-1/2 z-10',
+        :class="[ 
+          'absolute top-[45%] left-[-1.5rem] -translate-y-1/2 z-10 rounded-3xl px-2 hover:scale-110 hover:bg-opacity-85 transition-transform duration-200',
           customClass,
           sideArrowBgColor,
           sideArrowTextColor,
@@ -20,8 +20,8 @@
       <p
         v-if="showSideNavigation"
         @click="next"
-        :class="[
-          'absolute top-[45%] right-[-1.5rem] -translate-y-1/2 z-10',
+        :class="[ 
+          'absolute top-[45%] right-[-1.5rem] -translate-y-1/2 z-10 rounded-3xl px-2 hover:scale-110 hover:bg-opacity-85 transition-transform duration-200',
           customClass,
           sideArrowBgColor,
           sideArrowTextColor,
@@ -39,13 +39,12 @@
         :showIndicators="true"
         :showNavigators="false"
         ref="carouselRef"
+        @update:page="onPageChange"
         class="max-w-[80vw] mx-auto"
       >
         <template #item="{ data, index }">
           <div class="p-3 h-full">
-            <div
-              class="border rounded-xl shadow-md overflow-hidden bg-white h-full flex flex-col"
-            >
+            <div class="border rounded-xl shadow-md overflow-hidden bg-white h-full flex flex-col">
               <img
                 :src="data.image"
                 :alt="`Image ${index + 1}`"
@@ -69,8 +68,8 @@
       >
         <p
           @click="prev"
-          :class="[
-            'transition',
+          :class="[ 
+            'rounded-3xl px-2 py-[2px] hover:scale-110 hover:bg-opacity-85 transition-transform duration-200',
             customClass,
             sideArrowBgColor,
             sideArrowTextColor,
@@ -78,10 +77,15 @@
         >
           <i class="pi pi-angle-left text-xl"></i>
         </p>
+
+        <span class="font-semibold text-gray-700">
+          {{ displayedCount }} of {{ totalItems }}
+        </span>
+
         <p
           @click="next"
-          :class="[
-            'transition',
+          :class="[ 
+            'rounded-3xl px-2 py-[2px] hover:scale-110 hover:bg-opacity-85 transition-transform duration-200',
             customClass,
             sideArrowBgColor,
             sideArrowTextColor,
@@ -95,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import Carousel from "primevue/carousel";
 import "primeicons/primeicons.css";
 
@@ -121,7 +125,8 @@ const props = defineProps<{
 
 const carouselRef = ref<InstanceType<typeof Carousel> | null>(null);
 
-const numVisible = props.numVisible ?? 3;
+const defaultNumVisible = props.numVisible ?? 3;
+const numVisible = ref(defaultNumVisible);
 const numScroll = props.numScroll ?? 1;
 const circular = props.circular ?? false;
 const defaultSubtitle = props.subtitle ?? "This component is just for demo";
@@ -139,11 +144,55 @@ const computedResponsiveOptions = computed(() => [
   { breakpoint: "767px", numVisible: 1, numScroll: 1 },
 ]);
 
+const currentIndex = ref(0);
+const totalItems = computed(() => props.images.length);
+
 const next = (): void => {
   carouselRef.value?.navForward();
+  updateCurrentIndex(1);
 };
 
 const prev = (): void => {
   carouselRef.value?.navBackward();
+  updateCurrentIndex(-1);
 };
+
+const updateCurrentIndex = (direction: number): void => {
+  const newIndex = currentIndex.value + direction;
+  if (newIndex < 0) {
+    currentIndex.value = totalItems.value - 1;
+  } else if (newIndex >= totalItems.value) {
+    currentIndex.value = 0;
+  } else {
+    currentIndex.value = newIndex;
+  }
+};
+
+const onPageChange = (page: number) => {
+  currentIndex.value = page;
+};
+
+const displayedCount = computed(() => {
+  const count = currentIndex.value + numVisible.value;
+  return count > totalItems.value ? totalItems.value : count;
+});
+
+const updateNumVisibleBasedOnScreen = () => {
+  const width = window.innerWidth;
+  if (width <= 767) {
+    numVisible.value = 1;
+  } else if (width <= 991) {
+    numVisible.value = 2;
+  } else if( width <= 1199) {
+    numVisible.value = 3;
+  } else {
+    numVisible.value = defaultNumVisible;
+  }
+};
+
+onMounted(() => {
+  updateNumVisibleBasedOnScreen();
+  window.addEventListener("resize", updateNumVisibleBasedOnScreen);
+});
+
 </script>

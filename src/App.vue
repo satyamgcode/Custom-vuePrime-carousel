@@ -67,7 +67,7 @@ const carouselImages = [
     :circular="false"
     :showSideNavigation="true"
     :showBottomNavigation="true"
-    customClass="cursor-pointer rounded-3xl  px-1"
+    customClass="cursor-pointer "
     sideArrowBgColor="bg-orange-500"
     sideArrowTextColor="text-gray-200"
   />
